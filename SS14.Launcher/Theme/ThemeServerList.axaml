@@ -3,6 +3,17 @@
         xmlns:loc="clr-namespace:SS14.Launcher.Localization"
         xmlns:views="using:SS14.Launcher.Views"
         xmlns:mwt="using:SS14.Launcher.Views.MainWindowTabs">
+  <Styles.Resources>
+    <x:Double x:Key="ServerListScrollBarWidth">16</x:Double>
+    <Thickness x:Key="ServerListHeaderMargin">24 0 16 0</Thickness>
+  </Styles.Resources>
+
+  <!-- Fixed-width, always-present scrollbar so the reserved gutter is exact and constant. -->
+  <Style Selector="mwt|ServerList ScrollBar[Orientation=Vertical]">
+    <Setter Property="Width" Value="{StaticResource ServerListScrollBarWidth}" />
+    <Setter Property="Margin" Value="0" />
+  </Style>
+
   <Style Selector="ItemsControl.ServerList > ContentPresenter:nth-child(2n)">
     <Setter Property="Background">
       <DynamicResource ResourceKey="ThemeListAltRowBrush" />
@@ -57,7 +68,7 @@
     <Setter Property="Template">
       <ControlTemplate>
         <DockPanel ZIndex="-1" Grid.IsSharedSizeScope="True">
-          <Grid DockPanel.Dock="Top" Margin="24 0 24 0" IsVisible="{TemplateBinding ShowHeader}">
+          <Grid DockPanel.Dock="Top" Margin="{StaticResource ServerListHeaderMargin}" IsVisible="{TemplateBinding ShowHeader}">
             <Grid.ColumnDefinitions>
               <ColumnDefinition Width="*" /> <!-- Server Name -->
               <ColumnDefinition SharedSizeGroup="ModeCol" Width="Auto" />
@@ -98,7 +109,7 @@
               <DynamicResource ResourceKey="ThemeBackgroundBrush" />
             </Panel.Background>
             <ScrollViewer MinHeight="150" HorizontalScrollBarVisibility="Disabled"
-                          VerticalScrollBarVisibility="Auto">
+                          VerticalScrollBarVisibility="Visible">
               <DockPanel LastChildFill="True">
                 <StackPanel DockPanel.Dock="Bottom" IsVisible="True">
                   <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" />
