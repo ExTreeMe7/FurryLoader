@@ -10,6 +10,9 @@ from download_net_runtime import update_netcore_runtime, PLATFORM_WINDOWS, PLATF
 from exe_set_subsystem import set_subsystem
 
 TFM = "net10.0"
+PRODUCT_NAME = "FurryLoader"
+PRODUCT_EXE = f"{PRODUCT_NAME}.exe"
+PRODUCT_APP = f"{PRODUCT_NAME}.app"
 
 p = os.path.join
 
@@ -76,17 +79,13 @@ def publish_windows(x64_only: bool):
         os.makedirs("bin/publish/Windows/bin_arm64/loader", exist_ok=True)
         os.makedirs("bin/publish/Windows/dotnet_arm64", exist_ok=True)
 
-    bootstrap_path = f"SS14.Launcher.Bootstrap/bin/Release/{TFM}-windows/win-x64/publish/FurryLoader.exe"
+    bootstrap_path = f"SS14.Launcher.Bootstrap/bin/Release/{TFM}-windows/win-x64/publish/{PRODUCT_EXE}"
     # Natively compiled copy we need to get from a separate worker.
-    if os.path.isfile("FurryLoader.exe"):
-        bootstrap_path = "FurryLoader.exe"
-    elif os.path.isfile("MusyaLoader.exe"):
-        bootstrap_path = "MusyaLoader.exe"
+    if os.path.isfile(PRODUCT_EXE):
+        bootstrap_path = PRODUCT_EXE
     
     if os.path.isfile(bootstrap_path):
-        shutil.copyfile(bootstrap_path, "bin/publish/Windows/FurryLoader.exe")
-        # Compatibility alias: older self-update installs may still look for MusyaLoader.exe.
-        shutil.copyfile(bootstrap_path, "bin/publish/Windows/MusyaLoader.exe")
+        shutil.copyfile(bootstrap_path, f"bin/publish/Windows/{PRODUCT_EXE}")
     else:
         print("Bootstrap executable not found, skipping launcher stub.")
     shutil.copyfile("SS14.Launcher.Bootstrap/console.bat", "bin/publish/Windows/console.bat")
@@ -106,7 +105,7 @@ def publish_windows(x64_only: bool):
 
     copy_marsey_runtime_files("bin/publish/Windows")
 
-    shutil.make_archive("FurryLoader_Windows", "zip", "bin/publish/Windows")
+    shutil.make_archive(f"{PRODUCT_NAME}_Windows", "zip", "bin/publish/Windows")
 
 def publish_linux(x64_only: bool):
     update_netcore_runtime([PLATFORM_LINUX])
@@ -152,7 +151,7 @@ def publish_linux(x64_only: bool):
     copy_text_file_with_lf("PublishFiles/SS14.Launcher", "bin/publish/Linux/SS14.Launcher")
     copy_text_file_with_lf("PublishFiles/SS14.desktop", "bin/publish/Linux/SS14.desktop")
 
-    shutil.make_archive("FurryLoader_Linux", "zip", "bin/publish/Linux")
+    shutil.make_archive(f"{PRODUCT_NAME}_Linux", "zip", "bin/publish/Linux")
 
 
 def publish_osx():
@@ -161,11 +160,11 @@ def publish_osx():
     clear_prev_publish("macOS")
 
     os.makedirs("bin/publish/macOS", exist_ok=True)
-    shutil.copytree("PublishFiles/MusyaLoader.app", "bin/publish/macOS/MusyaLoader.app")
+    shutil.copytree(f"PublishFiles/{PRODUCT_APP}", f"bin/publish/macOS/{PRODUCT_APP}")
 
-    res_root = "bin/publish/macOS/MusyaLoader.app/Contents/Resources"
+    res_root = f"bin/publish/macOS/{PRODUCT_APP}/Contents/Resources"
 
-    loader_res_root = f"{res_root}/Musya.app/Contents/Resources"
+    loader_res_root = f"{res_root}/{PRODUCT_APP}/Contents/Resources"
 
     for arch in ["x64", "arm64"]:
         full_arch_name = "x86_64" if arch == "x64" else arch
@@ -178,7 +177,7 @@ def publish_osx():
     shutil.copytree("Dependencies/dotnet/mac", f"{res_root}/x86_64/dotnet")
     shutil.copytree("Dependencies/dotnet/mac-arm64", f"{res_root}/arm64/dotnet")
 
-    shutil.make_archive("FurryLoader_macOS", "zip", "bin/publish/macOS/")
+    shutil.make_archive(f"{PRODUCT_NAME}_macOS", "zip", "bin/publish/macOS/")
 
 def clear_prev_publish(publish_dir: str):
     shutil.rmtree(f"bin/publish/{publish_dir}", ignore_errors=True)

@@ -11,5 +11,5 @@ SS14.Launcher/FodyWeavers.xsd
 Marsey/Mods
 Marsey/Engines
 
-!PublishFiles/MusyaLoader.app/Contents/Resources/bin/
+!PublishFiles/FurryLoader.app/Contents/Resources/bin/
 __pycache__

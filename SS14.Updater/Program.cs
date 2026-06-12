@@ -31,7 +31,8 @@ try
 
     Directory.CreateDirectory(targetDir);
 
-    var extractRoot = Path.Combine(Path.GetTempPath(), $"musyaloader_update_extract_{Guid.NewGuid():N}");
+    var launcherBaseName = Path.GetFileNameWithoutExtension(launcherName);
+    var extractRoot = Path.Combine(Path.GetTempPath(), $"{launcherBaseName}_update_extract_{Guid.NewGuid():N}");
     Directory.CreateDirectory(extractRoot);
     ZipFile.ExtractToDirectory(zipPath, extractRoot);
 

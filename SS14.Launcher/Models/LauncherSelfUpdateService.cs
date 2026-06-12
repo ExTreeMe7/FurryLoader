@@ -69,7 +69,7 @@ public sealed class LauncherSelfUpdateService
 
         var endpoint = $"https://api.github.com/repos/{owner}/{repo}/releases?per_page=100";
         using var req = new HttpRequestMessage(HttpMethod.Get, endpoint);
-        req.Headers.UserAgent.ParseAdd("FurryLoader-Updater");
+        req.Headers.UserAgent.ParseAdd($"{LauncherVersion.Name}-Updater");
         req.Headers.Accept.ParseAdd("application/vnd.github+json");
 
         using var client = CreateHttpClientForUpdateChecks();
@@ -156,6 +156,7 @@ public sealed class LauncherSelfUpdateService
         if (root.TryGetProperty("assets", out var assets) && assets.ValueKind == JsonValueKind.Array)
         {
             var wantedOs = OperatingSystem.IsWindows() ? "windows" : "linux";
+            var productNameLower = LauncherVersion.Name.ToLowerInvariant();
             var candidates = new List<(string Url, string Name, int Priority)>();
             foreach (var asset in assets.EnumerateArray())
             {
@@ -171,7 +172,7 @@ public sealed class LauncherSelfUpdateService
                 if (!AssetMatchesCurrentOs(lower, wantedOs))
                     continue;
 
-                candidates.Add((url, name, GetAssetPriority(lower, wantedOs)));
+                candidates.Add((url, name, GetAssetPriority(lower, wantedOs, productNameLower)));
             }
 
             var selected = candidates
@@ -347,15 +348,15 @@ public sealed class LauncherSelfUpdateService
         return assetNameLower.Contains("linux", StringComparison.Ordinal) || assetNameLower.Contains("lin", StringComparison.Ordinal);
     }
 
-    private static int GetAssetPriority(string assetNameLower, string wantedOs)
+    private static int GetAssetPriority(string assetNameLower, string wantedOs, string productNameLower)
     {
         var score = 0;
 
-        if (assetNameLower.Contains("furryloader", StringComparison.Ordinal))
+        if (!string.IsNullOrWhiteSpace(productNameLower) &&
+            assetNameLower.Contains(productNameLower, StringComparison.Ordinal))
+        {
             score += 1000;
-
-        if (assetNameLower.Contains("musyaloader", StringComparison.Ordinal))
-            score -= 100;
+        }
 
         if (wantedOs == "windows")
         {

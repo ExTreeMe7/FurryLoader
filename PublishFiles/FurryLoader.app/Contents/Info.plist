@@ -5,11 +5,11 @@
     <key>CFBundleName</key>
     <string>SS14 Launcher</string>
     <key>CFBundleDisplayName</key>
-    <string>MusyaLoader</string>
+    <string>FurryLoader</string>
     <key>CFBundleExecutable</key>
     <string>SS14</string>
     <key>CFBundleIdentifier</key>
-    <string>com.musyaloader.launcher</string>
+    <string>com.furryloader.launcher</string>
     <key>LSApplicationCategoryType</key>
     <string>public.app-category.games</string>
     <key>LSArchitecturePriority</key>

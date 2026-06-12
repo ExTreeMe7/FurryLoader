@@ -36,12 +36,12 @@ internal sealed class ContentDbFileApi : IFileApi, IDisposable
             SQLITE_OPEN_READWRITE | SQLITE_OPEN_NOMUTEX,
             null);
 
-        // --- musyaloader change: SQLite performance tuning ---
+        // --- FurryLoader change: SQLite performance tuning ---
         sqlite3_exec(db, "PRAGMA journal_mode = WAL;");
         sqlite3_exec(db, "PRAGMA synchronous = OFF;");
         sqlite3_exec(db, "PRAGMA mmap_size = 268435456;"); // 256MB memory mapping
         sqlite3_exec(db, "PRAGMA cache_size = -65536;");   // 64MB cache
-        // --- end musyaloader change ---
+        // --- end FurryLoader change ---
 
         AddRunningClient(db, version);
         sqlite3_exec(db, "BEGIN");
@@ -61,10 +61,10 @@ internal sealed class ContentDbFileApi : IFileApi, IDisposable
                 SQLITE_OPEN_READONLY | SQLITE_OPEN_NOMUTEX,
                 null);
             
-            // --- musyaloader change: apply same optimizations to pool connections ---
+            // --- FurryLoader change: apply same optimizations to pool connections ---
             sqlite3_exec(db, "PRAGMA mmap_size = 268435456;");
             sqlite3_exec(db, "PRAGMA cache_size = -32768;"); 
-            // --- end musyaloader change ---
+            // --- end FurryLoader change ---
             
             CheckThrowSqliteErr(db, err);
             sqlite3_exec(db, "BEGIN");
@@ -203,9 +203,9 @@ internal sealed class ContentDbFileApi : IFileApi, IDisposable
             if (err != SQLITE_OK)
                 SqliteException.ThrowExceptionForRC(err, db);
 
-            // --- musyaloader change: specialized buffer allocation ---
+            // --- FurryLoader change: specialized buffer allocation ---
             var buffer = GC.AllocateUninitializedArray<byte>(length);
-            // --- end musyaloader change ---
+            // --- end FurryLoader change ---
 
             switch (compression)
             {
@@ -251,7 +251,7 @@ internal sealed class ContentDbFileApi : IFileApi, IDisposable
     {
         var remainingInput = sqlite3_blob_bytes(blob);
         var blobOffset = 0;
-        // --- musyaloader change: use shared array pool for decompression buffer ---
+        // --- FurryLoader change: use shared array pool for decompression buffer ---
         var buffer = ArrayPool<byte>.Shared.Rent((int)ZSTD_DStreamInSize());
         try
         {

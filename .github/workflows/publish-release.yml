@@ -4,6 +4,9 @@ on:
     tags:
       - '*'  # было v*, теперь ловит 0.37.1.44 и подобные
 
+env:
+  PRODUCT_NAME: FurryLoader
+
 jobs:
   build-windows-bootstrap:
     runs-on: windows-2022
@@ -22,7 +25,7 @@ jobs:
         with:
           name: bootstrap
           retention-days: 1
-          path: "SS14.Launcher.Bootstrap/bin/Release/net10.0-windows/win-x64/publish/MusyaLoader.exe"  # исправлено имя
+          path: "SS14.Launcher.Bootstrap/bin/Release/net10.0-windows/win-x64/publish/${{ env.PRODUCT_NAME }}.exe"
 
   build:
     runs-on: ubuntu-latest
@@ -61,8 +64,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./MusyaLoader_Linux.zip  # исправлено имя
-          asset_name: MusyaLoader_Linux.zip
+          asset_path: ./${{ env.PRODUCT_NAME }}_Linux.zip
+          asset_name: ${{ env.PRODUCT_NAME }}_Linux.zip
           asset_content_type: application/zip
       - name: Upload Windows
         uses: actions/upload-release-asset@v1
@@ -70,8 +73,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./MusyaLoader_Windows.zip  # исправлено имя
-          asset_name: MusyaLoader_Windows.zip
+          asset_path: ./${{ env.PRODUCT_NAME }}_Windows.zip
+          asset_name: ${{ env.PRODUCT_NAME }}_Windows.zip
           asset_content_type: application/zip
       - name: Upload macOS
         uses: actions/upload-release-asset@v1
@@ -79,6 +82,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./MusyaLoader_macOS.zip  # исправлено имя
-          asset_name: MusyaLoader_macOS.zip
+          asset_path: ./${{ env.PRODUCT_NAME }}_macOS.zip
+          asset_name: ${{ env.PRODUCT_NAME }}_macOS.zip
           asset_content_type: application/zip
