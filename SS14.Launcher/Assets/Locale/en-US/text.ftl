@@ -516,9 +516,9 @@ marsey-Resource-Override-Desc = [DEV] Disables Resource Pack fork target checks.
 
 marsey-Title-Manager = Title manager
 marsey-Randomize-Window-Titles = Randomize window titles
-marsey-Randomize-Window-Titles-Desc = Use a random title, otherwise "MusyaLoader"
+marsey-Randomize-Window-Titles-Desc = Use a random title, otherwise "FurryLoader"
 marsey-Randomize-Header-Images = Randomize header images
-marsey-Randomize-Header-Images-Desc = Use a random header image, otherwise stick to default MusyaLoader
+marsey-Randomize-Header-Images-Desc = Use a random header image, otherwise stick to default FurryLoader
 marsey-Randomize-Connection-Messages = Randomize connection messages
 marsey-Randomize-Connection-Messages-Desc = Use random, (un)funny messages instead of connection status ones
 

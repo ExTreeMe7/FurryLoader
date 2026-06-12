@@ -694,9 +694,9 @@ marsey-Resource-Override-Desc = [DEV] Отключает проверку цел
 
 marsey-Title-Manager = Менеджер заголовков
 marsey-Randomize-Window-Titles = Случайные заголовки окна
-marsey-Randomize-Window-Titles-Desc = Использовать случайный заголовок, иначе "MusyaLoader"
+marsey-Randomize-Window-Titles-Desc = Использовать случайный заголовок, иначе "FurryLoader"
 marsey-Randomize-Header-Images = Случайные изображения заголовка
-marsey-Randomize-Header-Images-Desc = Использовать случайное изображение заголовка, иначе придерживаться стандартного MusyaLoader
+marsey-Randomize-Header-Images-Desc = Использовать случайное изображение заголовка, иначе придерживаться стандартного FurryLoader
 marsey-Randomize-Connection-Messages = Случайные сообщения подключения
 marsey-Randomize-Connection-Messages-Desc = Использовать случайные, (не)смешные сообщения вместо сообщений о состоянии подключения
 

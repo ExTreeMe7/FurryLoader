@@ -1,4 +1,4 @@
-![MusyaLoader](SS14.Launcher/Assets/logo-long.png)
+![FurryLoader](SS14.Launcher/Assets/logo-long.png)
 
 Space Station 14 launcher fork with patching, proxy, resource pack, and custom engine support.
 
@@ -11,16 +11,16 @@ Space Station 14 launcher fork with patching, proxy, resource pack, and custom e
 ## Русский
 
 ### Что это
-`MusyaLoader` это форк лаунчера SS14 с упором на кастомизацию клиента, патчи, приватность и дополнительные инструменты для запуска.
+`FurryLoader` это форк лаунчера SS14 с упором на кастомизацию клиента, патчи, приватность и дополнительные инструменты для запуска.
 
 ### Скачать и запустить
 ЕСЛИ ВАМ НЕ НАДО НЕ СОБИРАЙТЕ, А СКАЧАЙТЕ РЕЛИЗ ЕСЛИ ПРОСТО ХОТИТЕ ПОИГРАТЬ
 Жмёте на кнопку Releases справа на сайте github и там скачиваете последний под вашу систему, windows, linux и т.д.
 Распаковываете архив и так же запускаете exe, shell и т.д. файл под вашу систему.
-По поводу 20+ детектов на сам bootstrap ну который "MusyaLoader.exe" я не знаю почему у него столько детектов, можете сами сбилдить и залить на virustotal там будут детекты типо вирус и т.д. может потом починю 
+По поводу 20+ детектов на сам bootstrap ну который "FurryLoader.exe" я не знаю почему у него столько детектов, можете сами сбилдить и залить на virustotal там будут детекты типо вирус и т.д. может потом починю 
 
 ### Ссылки
-- GitHub Releases: `https://github.com/MusyaCliento/MusyaLoader/releases`
+- GitHub Releases: `https://github.com/ExTreeMe7/FurryLoader/releases`
 - Discord: `https://discord.gg/u9d6nGSnse`
 - Гайд по ресурс-пакам: [docs/RESOURCE_PACKS.md](docs/RESOURCE_PACKS.md)
 - Гайд по кастомным движкам: [docs/CUSTOM_ENGINES.md](docs/CUSTOM_ENGINES.md)
@@ -93,30 +93,30 @@ Space Station 14 launcher fork with patching, proxy, resource pack, and custom e
 ### Сборка
 1. Установить `.NET 10 SDK`.
 2. Клонировать репозиторий с сабмодулями:
-   `git clone --recurse-submodules https://github.com/MusyaCliento/MusyaLoader.git`
+   `git clone --recurse-submodules https://github.com/ExTreeMe7/FurryLoader.git`
 3. Собрать:
    `python publish.py windows --x64-only` для Windows
 
    `python publish.py linux --x64-only` для Linux
 
    `python publish.py osx` для macOS
-4. Забрать архив `MusyaLoader_<OS>.zip`, распаковать и запустить.
+4. Забрать архив `FurryLoader_<OS>.zip`, распаковать и запустить.
 
 ---
 
 ## English
 
 ### What it is
-`MusyaLoader` is an SS14 launcher fork focused on client customization, patches, privacy, and extra launch-related tools.
+`FurryLoader` is an SS14 launcher fork focused on client customization, patches, privacy, and extra launch-related tools.
 
 ### Download and run
 IF YOU DO NOT NEED TO BUILD IT, DO NOT BUILD IT, JUST DOWNLOAD A RELEASE IF YOU ONLY WANT TO PLAY
 Click the `Releases` button on the right side of the GitHub page and download the latest build for your system, Windows, Linux, etc.
 Extract the archive and run the `.exe`, shell script, or other file for your system.
-About the 20+ detections on the bootstrap itself, the one called `MusyaLoader.exe`, I do not know why it gets that many detections. You can build it yourself and upload it to VirusTotal, and there will still be detections like virus and so on. Maybe I will fix it later.
+About the 20+ detections on the bootstrap itself, the one called `FurryLoader.exe`, I do not know why it gets that many detections. You can build it yourself and upload it to VirusTotal, and there will still be detections like virus and so on. Maybe I will fix it later.
 
 ### Links
-- GitHub Releases: `https://github.com/MusyaCliento/MusyaLoader/releases`
+- GitHub Releases: `https://github.com/ExTreeMe7/FurryLoader/releases`
 - Discord: `https://discord.gg/u9d6nGSnse`
 - Resource packs guide: [docs/RESOURCE_PACKS.md](docs/RESOURCE_PACKS.md)
 - Custom engines guide: [docs/CUSTOM_ENGINES.md](docs/CUSTOM_ENGINES.md)
@@ -189,11 +189,11 @@ About the 20+ detections on the bootstrap itself, the one called `MusyaLoader.ex
 ### Build
 1. Install `.NET 10 SDK`.
 2. Clone with submodules:
-   `git clone --recurse-submodules https://github.com/MusyaCliento/MusyaLoader.git`
+   `git clone --recurse-submodules https://github.com/ExTreeMe7/FurryLoader.git`
 3. Build:
    `python publish.py windows --x64-only` for Windows
 
    `python publish.py linux --x64-only` for Linux
 
    `python publish.py osx` for macOS
-4. Take `MusyaLoader_<OS>.zip`, extract it, and run it.
+4. Take `FurryLoader_<OS>.zip`, extract it, and run it.

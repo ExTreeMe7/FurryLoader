@@ -390,9 +390,9 @@ public sealed class MainWindowViewModel : ViewModelBase, IErrorOverlayOwner
             LauncherUpdateProgress = 0;
             LauncherUpdateProgressText = _loc.GetString("launcher-update-progress-preparing");
 
-            var targetFile = Path.Combine(Path.GetTempPath(), $"MusyaLoaderUpdate_{Guid.NewGuid():N}.zip");
+            var targetFile = Path.Combine(Path.GetTempPath(), $"FurryLoaderUpdate_{Guid.NewGuid():N}.zip");
             using var request = new HttpRequestMessage(HttpMethod.Get, _pendingLauncherUpdate.DownloadUrl);
-            request.Headers.UserAgent.ParseAdd("MusyaLoader-Updater");
+            request.Headers.UserAgent.ParseAdd("FurryLoader-Updater");
             using var response = await _http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
             response.EnsureSuccessStatusCode();
 

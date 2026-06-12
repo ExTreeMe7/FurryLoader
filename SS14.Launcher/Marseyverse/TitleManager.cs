@@ -59,7 +59,7 @@ public class TitleManager
         "Space Station 14 Launcher", "Dramalauncher",
         "Marsey", "Moonyware", "Marseyloader",
         "Robustcontrol", "Mirailoader", "Almost BepInEx",
-        "Musya ", "MIT-certified funny",
+        "FurryLoader", "MIT-certified funny",
         "戏剧装载机", "Oldest anarchy launcher in ss14",
         "ILVerifier", "Space Station 13", "BYOND",
         "Goonstation", "BYONDCONTROL", "Unitystation",
