@@ -4,7 +4,6 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
-using SS14.Launcher.Localization;
 using SS14.Launcher.ViewModels;
 using TerraFX.Interop.Windows;
 using IDataObject = Avalonia.Input.IDataObject;
@@ -29,20 +28,11 @@ public partial class MainWindow : Window
         AddHandler(DragDrop.DropEvent, Drop);
 
         _content = (MainWindowContent) Content!;
-
-        ReloadTitle();
     }
 
     public void ReloadContent()
     {
-        ReloadTitle();
-
         Content = _content = new MainWindowContent();
-    }
-
-    private void ReloadTitle()
-    {
-        Title = _viewModel?.RandomTitle ?? LocalizationManager.Instance.GetString("main-window-title");
     }
 
     protected override void OnDataContextChanged(EventArgs e)
@@ -57,10 +47,6 @@ public partial class MainWindow : Window
         if (_viewModel != null)
         {
             _viewModel.Control = this;
-        }
-        else
-        {
-            ReloadTitle();
         }
 
         base.OnDataContextChanged(e);

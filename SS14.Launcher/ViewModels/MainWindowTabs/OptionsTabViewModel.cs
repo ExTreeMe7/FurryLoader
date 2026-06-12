@@ -1010,6 +1010,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel, INotifyPropertyChange
         {
             Cfg.SetCVar(CVars.RandTitle, value);
             Cfg.CommitConfig();
+            WeakReferenceMessenger.Default.Send(new TitleRandomizationChanged());
         }
     }
 
