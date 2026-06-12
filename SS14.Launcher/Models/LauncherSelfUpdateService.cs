@@ -156,6 +156,7 @@ public sealed class LauncherSelfUpdateService
         if (root.TryGetProperty("assets", out var assets) && assets.ValueKind == JsonValueKind.Array)
         {
             var wantedOs = OperatingSystem.IsWindows() ? "windows" : "linux";
+            var candidates = new List<(string Url, string Name, int Priority)>();
             foreach (var asset in assets.EnumerateArray())
             {
                 var name = asset.TryGetProperty("name", out var assetNameProp) ? assetNameProp.GetString() ?? "" : "";
@@ -170,10 +171,19 @@ public sealed class LauncherSelfUpdateService
                 if (!AssetMatchesCurrentOs(lower, wantedOs))
                     continue;
 
-                assetUrl = url;
-                assetName = name;
+                candidates.Add((url, name, GetAssetPriority(lower, wantedOs)));
+            }
+
+            var selected = candidates
+                .OrderByDescending(c => c.Priority)
+                .ThenBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
+                .FirstOrDefault();
+
+            if (selected.Url != null)
+            {
+                assetUrl = selected.Url;
+                assetName = selected.Name;
                 installSupported = true;
-                break;
             }
         }
 
@@ -335,6 +345,46 @@ public sealed class LauncherSelfUpdateService
             return assetNameLower.Contains("windows", StringComparison.Ordinal) || assetNameLower.Contains("win", StringComparison.Ordinal);
 
         return assetNameLower.Contains("linux", StringComparison.Ordinal) || assetNameLower.Contains("lin", StringComparison.Ordinal);
+    }
+
+    private static int GetAssetPriority(string assetNameLower, string wantedOs)
+    {
+        var score = 0;
+
+        if (assetNameLower.Contains("furryloader", StringComparison.Ordinal))
+            score += 1000;
+
+        if (assetNameLower.Contains("musyaloader", StringComparison.Ordinal))
+            score -= 100;
+
+        if (wantedOs == "windows")
+        {
+            if (assetNameLower.Contains("windows", StringComparison.Ordinal))
+                score += 20;
+            else if (assetNameLower.Contains("win", StringComparison.Ordinal))
+                score += 10;
+        }
+        else
+        {
+            if (assetNameLower.Contains("linux", StringComparison.Ordinal))
+                score += 20;
+            else if (assetNameLower.Contains("lin", StringComparison.Ordinal))
+                score += 10;
+        }
+
+        if (assetNameLower.Contains("x64", StringComparison.Ordinal) ||
+            assetNameLower.Contains("amd64", StringComparison.Ordinal))
+        {
+            score += 5;
+        }
+
+        if (assetNameLower.Contains("arm", StringComparison.Ordinal) ||
+            assetNameLower.Contains("aarch64", StringComparison.Ordinal))
+        {
+            score -= 20;
+        }
+
+        return score;
     }
 
     private static bool TryParseRepo(string input, out string owner, out string repo)
