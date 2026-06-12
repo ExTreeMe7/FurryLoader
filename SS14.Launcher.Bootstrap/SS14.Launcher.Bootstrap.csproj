@@ -10,7 +10,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
     <PublishAot>true</PublishAot>
-    <TargetName>MusyaLoader</TargetName>
+    <TargetName>FurryLoader</TargetName>
     <ApplicationIcon>../SS14.Launcher/Assets/icon.ico</ApplicationIcon>
 
     <OptimizationPreference>Size</OptimizationPreference>
