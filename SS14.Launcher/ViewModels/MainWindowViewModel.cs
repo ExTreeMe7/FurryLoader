@@ -35,6 +35,8 @@ namespace SS14.Launcher.ViewModels;
 
 public sealed class MainWindowViewModel : ViewModelBase, IErrorOverlayOwner
 {
+    private static readonly TimeSpan TitleRefreshInterval = TimeSpan.FromSeconds(10);
+
     private readonly DataManager _cfg;
     private readonly LoginManager _loginMgr;
     private readonly HttpClient _http;
@@ -114,6 +116,11 @@ public sealed class MainWindowViewModel : ViewModelBase, IErrorOverlayOwner
 
         _cfg.Logins.Connect()
             .Subscribe(_ => { this.RaisePropertyChanged(nameof(AccountDropDownVisible)); });
+
+        Observable.Interval(TitleRefreshInterval, RxApp.MainThreadScheduler)
+            .Subscribe(_ => RefreshTitle());
+
+        RefreshTitle();
 
         // If we leave the login view model (by an account getting selected)
         // we reset it to login state
@@ -642,7 +649,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IErrorOverlayOwner
 
     private void RefreshTitle()
     {
-        _randomTitle = new TitleManager().RandomTitle;
+        _randomTitle = TitleManager.GenerateTitle(_cfg);
         this.RaisePropertyChanged(nameof(RandomTitle));
     }
 

@@ -42,7 +42,7 @@ public partial class MainWindow : Window
 
     private void ReloadTitle()
     {
-        Title = LocalizationManager.Instance.GetString("main-window-title");
+        Title = _viewModel?.RandomTitle ?? LocalizationManager.Instance.GetString("main-window-title");
     }
 
     protected override void OnDataContextChanged(EventArgs e)
@@ -57,6 +57,10 @@ public partial class MainWindow : Window
         if (_viewModel != null)
         {
             _viewModel.Control = this;
+        }
+        else
+        {
+            ReloadTitle();
         }
 
         base.OnDataContextChanged(e);

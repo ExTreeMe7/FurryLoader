@@ -1,11 +1,8 @@
 using System;
 using System.Collections.Generic;
-using DynamicData;
 using Marsey.Patches;
 using Marsey.Subversion;
-using Splat;
 using SS14.Launcher.Models.Data;
-using SS14.Launcher.Utility;
 
 namespace SS14.Launcher.Marseyverse;
 
@@ -20,16 +17,15 @@ public class TitleManager
     private const string BanMessage = "Banned";
     private static readonly Random Random = new Random();
 
-    public TitleManager()
+    public static string GenerateTitle(DataManager cfg)
     {
-        DataManager cfg = Locator.Current.GetRequiredService<DataManager>(); // Thanks for inspiration.gif
         if (!cfg.GetCVar(CVars.RandTitle))
         {
-            RandomTitle = LauncherVersion.Name;
-            return;
+            return LauncherVersion.Name;
         }
 
-        List<TitleCondition> titleConditions = new List<TitleCondition>
+        var tagLines = new List<string>(TagLines);
+        var titleConditions = new List<TitleCondition>
         {
             new TitleCondition { Condition = () => OperatingSystem.IsWindows(), Message = "if (OperatingSystem.IsWindows()" },
             new TitleCondition { Condition = () => Subverter.GetSubverterPatches().Count > 5, Message = "Subversion is superior to git you know" },
@@ -40,7 +36,7 @@ public class TitleManager
         foreach (TitleCondition condition in titleConditions)
         {
             if (condition.Condition())
-                TagLines.Add(condition.Message);
+                tagLines.Add(condition.Message);
         }
 
         string name = RandTitle();
@@ -49,9 +45,9 @@ public class TitleManager
         if (name == BanMessage)
             tagline = RandBanReason();
         else
-            tagline = RandTagLine();
+            tagline = RandTagLine(tagLines);
 
-        RandomTitle = name + ": " + tagline;
+        return name + ": " + tagline;
     }
 
     private static readonly List<string> Titles =
@@ -125,10 +121,9 @@ public class TitleManager
         "Disposal bypassing into armory", "Exploiting pulling"
     ];
 
-    public string RandomTitle { get; }
-
     public static string RandTitle() => Titles[Random.Next(Titles.Count)];
-    public static string RandTagLine() => TagLines[Random.Next(TagLines.Count)];
+    public static string RandTagLine() => RandTagLine(TagLines);
+    private static string RandTagLine(IReadOnlyList<string> tagLines) => tagLines[Random.Next(tagLines.Count)];
     public static string RandBanReason() => BanReasons[Random.Next(BanReasons.Count)];
     public static string RandAction() => Actions[Random.Next(Actions.Count)];
 }
