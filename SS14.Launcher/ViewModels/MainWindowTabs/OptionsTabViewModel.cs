@@ -1021,6 +1021,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel, INotifyPropertyChange
         {
             Cfg.SetCVar(CVars.RandHeader, value);
             Cfg.CommitConfig();
+            WeakReferenceMessenger.Default.Send(new HeaderRandomizationChanged());
         }
     }
 

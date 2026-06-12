@@ -38,6 +38,8 @@ public class App : Application
     private readonly OverrideAssetsManager _overrideAssets;
 
     private readonly Dictionary<string, object> _baseAssets = new();
+    private readonly HashSet<string> _activeOverrideAssets = new();
+    private Uri? _lastLogoUri;
 
     // XAML insists on a parameterless constructor existing, despite this never being used.
     [UsedImplicitly]
@@ -93,7 +95,8 @@ public class App : Application
         object asset = LoadAsset(def.Type, dataStream);
 
         _baseAssets["LogoLong"] = asset;
-        Resources["LogoLong"] = asset;
+        if (!_activeOverrideAssets.Contains("LogoLong"))
+            Resources["LogoLong"] = asset;
     }
 
     private static bool IsRandHeaderEnabled()
@@ -109,21 +112,30 @@ public class App : Application
         }
     }
 
-    private static Uri ResolveLogoUri(bool randomize)
+    private Uri ResolveLogoUri(bool randomize)
     {
         if (!randomize)
+        {
+            _lastLogoUri = null;
             return new Uri("avares://SS14.Launcher/Assets/logo-long.png");
+        }
 
         var logos = new List<Uri>(AssetLoader.GetAssets(new Uri("avares://SS14.Launcher/Assets/logos"), null));
         if (logos.Count == 0)
             return new Uri("avares://SS14.Launcher/Assets/logo-long.png");
 
+        if (_lastLogoUri is { } lastLogoUri && logos.Count > 1)
+            logos.RemoveAll(uri => uri == lastLogoUri);
+
         var randomIndex = Random.Shared.Next(logos.Count);
-        return logos[randomIndex];
+        _lastLogoUri = logos[randomIndex];
+        return _lastLogoUri;
     }
 
     private void OnAssetsChanged(OverrideAssetsChanged obj)
     {
+        _activeOverrideAssets.Clear();
+
         foreach (var (name, data) in obj.Files)
         {
             if (!AssetDefs.TryGetValue(name, out var def))
@@ -135,6 +147,7 @@ public class App : Application
             var ms = new MemoryStream(data, writable: false);
             var asset = LoadAsset(def.Type, ms);
 
+            _activeOverrideAssets.Add(name);
             Resources[name] = asset;
         }
 
