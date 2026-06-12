@@ -100,6 +100,8 @@ def publish_windows(x64_only: bool):
         shutil.copytree(f"SS14.Updater/bin/Release/{TFM}/win-arm64/publish", "bin/publish/Windows/bin_arm64", dirs_exist_ok=True)
         shutil.copytree(f"SS14.ProxyService/bin/Release/{TFM}/win-arm64/publish", "bin/publish/Windows/bin_arm64", dirs_exist_ok=True)
 
+    copy_marsey_runtime_files("bin/publish/Windows")
+
     shutil.make_archive("MusyaLoader_Windows", "zip", "bin/publish/Windows")
 
 def publish_linux(x64_only: bool):
@@ -141,6 +143,8 @@ def publish_linux(x64_only: bool):
         shutil.copytree(f"SS14.Updater/bin/Release/{TFM}/linux-arm64/publish", "bin/publish/Linux/bin_arm64", dirs_exist_ok=True)
         shutil.copytree(f"SS14.ProxyService/bin/Release/{TFM}/linux-arm64/publish", "bin/publish/Linux/bin_arm64", dirs_exist_ok=True)
 
+    copy_marsey_runtime_files("bin/publish/Linux")
+
     copy_text_file_with_lf("PublishFiles/SS14.Launcher", "bin/publish/Linux/SS14.Launcher")
     copy_text_file_with_lf("PublishFiles/SS14.desktop", "bin/publish/Linux/SS14.desktop")
 
@@ -177,6 +181,16 @@ def clear_prev_publish(publish_dir: str):
 
     for path in glob.glob("**/bin"):
         shutil.rmtree(path)
+
+
+def copy_marsey_runtime_files(dst_root: str):
+    for directory in ["Mods", "ResourcePacks", "Engines", "Dumper"]:
+        src = p("Marsey", directory)
+        dst = p(dst_root, "Marsey", directory)
+        os.makedirs(dst, exist_ok=True)
+
+        if os.path.isdir(src):
+            shutil.copytree(src, dst, dirs_exist_ok=True)
 
 
 def run(*args: str):

@@ -70,7 +70,8 @@ public static class Subverse
                 continue;
             }
 
-            Assembly subverterAssembly = Assembly.LoadFrom(path);
+            string shadowPath = FileHandler.CreateShadowCopy(path);
+            Assembly subverterAssembly = Assembly.LoadFrom(shadowPath);
             MarseyLogger.Log(MarseyLogger.LogType.DEBG, "Subversion", $"Sideloading {path}");
             AssemblyFieldHandler.InitLogger(subverterAssembly, subverterAssembly.FullName);
             Sedition.InitSedition(subverterAssembly, subverterAssembly.FullName);

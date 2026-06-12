@@ -1,4 +1,6 @@
 using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 using Marsey.Config;
 using Marsey.Game.Resources;
 using Marsey.Game.Resources.Dumper.Resource;
@@ -14,6 +16,11 @@ namespace Marsey.Misc;
 /// </summary>
 public abstract class FileHandler
 {
+    private static readonly string ShadowCopyRoot = Path.Combine(Path.GetTempPath(), "MarseyShadowCopies");
+    private static readonly string ShadowCopySession = Guid.NewGuid().ToString("N");
+    private static readonly Dictionary<string, string> ShadowDirectories = new(StringComparer.OrdinalIgnoreCase);
+    private static bool _shadowCleanupAttempted;
+
     private static void EnsureMarseyDirectories()
     {
         Directory.CreateDirectory(MarseyVars.MarseyFolder);
@@ -48,7 +55,7 @@ public static async Task PrepareMods(string[]? path = null)
         .ToList();
 
     // Send preloading MarseyPatches through named pipe
-    string preloadData = string.Join(",", preloadpaths);
+    string preloadData = EncodePipePayload(preloadpaths);
     Task preloadTask = server.ReadySend("PreloadMarseyPatchesPipe", preloadData);
 
     // If we actually do have any - remove them from the marseypatch list
@@ -59,17 +66,17 @@ public static async Task PrepareMods(string[]? path = null)
 
     // Prepare remaining MarseyPatches
     List<string> marseyAsmpaths = marseyPatches.Where(p => p.Enabled).Select(p => p.Asmpath).ToList();
-    string marseyData = string.Join(",", marseyAsmpaths);
+    string marseyData = EncodePipePayload(marseyAsmpaths);
     Task marseyTask = server.ReadySend("MarseyPatchesPipe", marseyData);
 
     // Prepare SubverterPatches
     List<string> subverterAsmpaths = subverterPatches.Where(p => p.Enabled).Select(p => p.Asmpath).ToList();
-    string subverterData = string.Join(",", subverterAsmpaths);
+    string subverterData = EncodePipePayload(subverterAsmpaths);
     Task subverterTask = server.ReadySend("SubverterPatchesPipe", subverterData);
 
     // Prepare ResourcePacks
     List<string> rpackPaths = resourcePacks.Where(rp => rp.Enabled).Select(rp => rp.Dir).ToList();
-    string rpackData = string.Join(",", rpackPaths);
+    string rpackData = EncodePipePayload(rpackPaths);
     Task resourceTask = server.ReadySend("ResourcePacksPipe", rpackData);
 
     // Wait for all tasks to complete
@@ -125,6 +132,23 @@ public static async Task PrepareMods(string[]? path = null)
             .ToList();
     }
 
+    private static string EncodePipePayload(IEnumerable<string> paths)
+    {
+        return string.Join(",", paths.Select(PercentEncode));
+    }
+
+    private static string PercentEncode(string s)
+    {
+        try
+        {
+            return Uri.EscapeDataString(s);
+        }
+        catch
+        {
+            return s;
+        }
+    }
+
     private static string PercentDecode(string s)
     {
         try
@@ -151,8 +175,9 @@ public static async Task PrepareMods(string[]? path = null)
         {
             if (lockup)
             {
-                Assembly assembly = Assembly.LoadFrom(file);
-                AssemblyInitializer.Initialize(assembly, assembly.Location);
+                string shadowPath = CreateShadowCopy(file);
+                Assembly assembly = Assembly.LoadFrom(shadowPath);
+                AssemblyInitializer.Initialize(assembly, file);
             }
             else
             {
@@ -180,6 +205,133 @@ public static async Task PrepareMods(string[]? path = null)
         }
     }
 
+    public static string CreateShadowCopy(string file)
+    {
+        if (string.IsNullOrWhiteSpace(file) || !File.Exists(file))
+            return file;
+
+        try
+        {
+            CleanupOldShadowCopies();
+
+            string fullPath = Path.GetFullPath(file);
+            string? sourceDirectory = Path.GetDirectoryName(fullPath);
+            if (string.IsNullOrWhiteSpace(sourceDirectory))
+                return fullPath;
+
+            string shadowDirectory = GetShadowDirectory(sourceDirectory);
+            CopyTopLevelFiles(sourceDirectory, shadowDirectory);
+
+            string shadowPath = Path.Combine(shadowDirectory, Path.GetFileName(fullPath));
+            return File.Exists(shadowPath) ? shadowPath : fullPath;
+        }
+        catch (Exception ex)
+        {
+            MarseyLogger.Log(MarseyLogger.LogType.WARN, "ShadowCopy", $"Failed to shadow-copy {Path.GetFileName(file)}: {ex.Message}");
+            return file;
+        }
+    }
+
+    private static string GetShadowDirectory(string sourceDirectory)
+    {
+        string fullSourceDirectory = Path.GetFullPath(sourceDirectory);
+        string directoryFingerprint = ComputeDirectoryFingerprint(fullSourceDirectory);
+        string cacheKey = $"{fullSourceDirectory}|{directoryFingerprint}";
+
+        if (ShadowDirectories.TryGetValue(cacheKey, out string? cachedDirectory))
+            return cachedDirectory;
+
+        byte[] hash = SHA256.HashData(Encoding.UTF8.GetBytes(fullSourceDirectory));
+        string directoryName = Convert.ToHexString(hash)[..16];
+        string shadowDirectory = Path.Combine(ShadowCopyRoot, ShadowCopySession, directoryName, directoryFingerprint);
+        Directory.CreateDirectory(shadowDirectory);
+        ShadowDirectories[cacheKey] = shadowDirectory;
+        return shadowDirectory;
+    }
+
+    private static string ComputeDirectoryFingerprint(string sourceDirectory)
+    {
+        StringBuilder builder = new();
+
+        foreach (string sourceFile in Directory
+                     .EnumerateFiles(sourceDirectory)
+                     .OrderBy(Path.GetFileName, StringComparer.OrdinalIgnoreCase))
+        {
+            FileInfo info = new FileInfo(sourceFile);
+            builder
+                .Append(Path.GetFileName(sourceFile))
+                .Append('\0')
+                .Append(info.Length)
+                .Append(':')
+                .Append(info.LastWriteTimeUtc.Ticks)
+                .Append('\0');
+
+            try
+            {
+                using FileStream stream = new FileStream(sourceFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+                builder.Append(Convert.ToHexString(SHA256.HashData(stream)));
+            }
+            catch
+            {
+                builder.Append("unreadable");
+            }
+
+            builder.Append('\0');
+        }
+
+        byte[] fingerprint = SHA256.HashData(Encoding.UTF8.GetBytes(builder.ToString()));
+        return Convert.ToHexString(fingerprint)[..16];
+    }
+
+    private static void CopyTopLevelFiles(string sourceDirectory, string shadowDirectory)
+    {
+        foreach (string sourceFile in Directory.EnumerateFiles(sourceDirectory))
+        {
+            string targetFile = Path.Combine(shadowDirectory, Path.GetFileName(sourceFile));
+            if (File.Exists(targetFile))
+                continue;
+
+            CopyFile(sourceFile, targetFile);
+        }
+    }
+
+    private static void CopyFile(string sourceFile, string targetFile)
+    {
+        using FileStream source = new FileStream(sourceFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+        using FileStream target = new FileStream(targetFile, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
+        source.CopyTo(target);
+    }
+
+    private static void CleanupOldShadowCopies()
+    {
+        if (_shadowCleanupAttempted)
+            return;
+
+        _shadowCleanupAttempted = true;
+
+        try
+        {
+            if (!Directory.Exists(ShadowCopyRoot))
+                return;
+
+            foreach (string directory in Directory.EnumerateDirectories(ShadowCopyRoot))
+            {
+                try
+                {
+                    Directory.Delete(directory, recursive: true);
+                }
+                catch
+                {
+                    // Best-effort cleanup: old shadow copies can be locked while a client is running.
+                }
+            }
+        }
+        catch
+        {
+            // Shadow cleanup must not block patch loading.
+        }
+    }
+
     /// <summary>
     /// Retrieves the file paths of all DLL files in a specified subdirectory
     /// </summary>
@@ -196,7 +348,10 @@ public static async Task PrepareMods(string[]? path = null)
 
             if (Directory.Exists(path))
             {
-                return Directory.GetFiles(path, "*.dll").ToList();
+                return Directory
+                    .GetFiles(path, "*.dll")
+                    .OrderBy(Path.GetFileName, StringComparer.OrdinalIgnoreCase)
+                    .ToList();
             }
 
             MarseyLogger.Log(MarseyLogger.LogType.DEBG, $"Directory {path} does not exist");
