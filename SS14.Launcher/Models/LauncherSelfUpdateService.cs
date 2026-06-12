@@ -69,7 +69,7 @@ public sealed class LauncherSelfUpdateService
 
         var endpoint = $"https://api.github.com/repos/{owner}/{repo}/releases?per_page=100";
         using var req = new HttpRequestMessage(HttpMethod.Get, endpoint);
-        req.Headers.UserAgent.ParseAdd("MusyaLoader-Updater");
+        req.Headers.UserAgent.ParseAdd("FurryLoader-Updater");
         req.Headers.Accept.ParseAdd("application/vnd.github+json");
 
         using var client = CreateHttpClientForUpdateChecks();

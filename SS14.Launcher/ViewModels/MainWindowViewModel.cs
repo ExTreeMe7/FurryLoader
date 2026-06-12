@@ -305,7 +305,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IErrorOverlayOwner
 
     private async Task CheckLauncherSelfUpdate()
     {
-        var repo = _cfg.GetCVar(CVars.LauncherUpdateRepo);
+        var repo = CVars.GetLauncherUpdateRepo(_cfg);
         var auto = _cfg.GetCVar(CVars.LauncherAutoUpdate);
         var notify = _cfg.GetCVar(CVars.LauncherUpdateNotify);
         var allowPreRelease = _cfg.GetCVar(CVars.LauncherUpdateAllowPreRelease);

@@ -382,7 +382,8 @@ public static class CVars
     public static readonly CVarDef<bool> LauncherAutoUpdate = CVarDef.Create("LauncherAutoUpdate", false);
     public static readonly CVarDef<bool> LauncherUpdateNotify = CVarDef.Create("LauncherUpdateNotify", true);
     public static readonly CVarDef<bool> LauncherUpdateAllowPreRelease = CVarDef.Create("LauncherUpdateAllowPreRelease", false);
-    public static readonly CVarDef<string> LauncherUpdateRepo = CVarDef.Create("LauncherUpdateRepo", "https://github.com/MusyaCliento/MusyaLoader");
+    public static readonly CVarDef<string> LauncherUpdateRepo = CVarDef.Create("LauncherUpdateRepo", "https://github.com/ExTreeMe7/FurryLoader");
+    private const string LegacyLauncherUpdateRepo = "https://github.com/MusyaCliento/MusyaLoader";
     public static readonly CVarDef<bool> LauncherProxyEnabled = CVarDef.Create("LauncherProxyEnabled", false);
     public static readonly CVarDef<bool> LauncherProxyUpdatesEnabled = CVarDef.Create("LauncherProxyUpdatesEnabled", false);
     public static readonly CVarDef<string> LauncherProxyHost = CVarDef.Create("LauncherProxyHost", "127.0.0.1");
@@ -400,6 +401,20 @@ public static class CVars
     public static readonly CVarDef<string> UpdateManifestUrl = CVarDef.Create("UpdateManifestUrl", ""); 
     public static readonly CVarDef<string> LauncherVersion = CVarDef.Create("LauncherVersion", "0.0.0");
 
+    public static string GetLauncherUpdateRepo(DataManager cfg)
+    {
+        var repo = cfg.GetCVar(LauncherUpdateRepo)?.Trim() ?? "";
+        if (string.Equals(repo, LegacyLauncherUpdateRepo, StringComparison.OrdinalIgnoreCase))
+            repo = LauncherUpdateRepo.DefaultValue;
+
+        if (!string.Equals(repo, cfg.GetCVar(LauncherUpdateRepo), StringComparison.Ordinal))
+        {
+            cfg.SetCVar(LauncherUpdateRepo, repo);
+            cfg.CommitConfig();
+        }
+
+        return repo;
+    }
 }
 
 /// <summary>

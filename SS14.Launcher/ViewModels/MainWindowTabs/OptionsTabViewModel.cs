@@ -1222,7 +1222,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel, INotifyPropertyChange
 
     public string LauncherUpdateRepo
     {
-        get => Cfg.GetCVar(CVars.LauncherUpdateRepo);
+        get => CVars.GetLauncherUpdateRepo(Cfg);
         set
         {
             Cfg.SetCVar(CVars.LauncherUpdateRepo, value?.Trim() ?? "");
